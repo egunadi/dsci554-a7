@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .active {
+      background-color: #007bff;
+      color: #fff;
+    }
+  </style>
+  <title>Styled Buttons</title>
+</head>
+<body>
+  <div class="container mt-5">
+    <div class="container mb-3">
+      <button class="btn btn-primary mr-2 active" id="ascBtn">Sort Ascending</button>
+      <button class="btn btn-primary mr-2" id="descBtn">Sort Descending</button>
+    </div>
+    <div class="container mb-3">
+      <button class="btn btn-secondary mr-2" id="allBtn">All Items</button>
+      <button class="btn btn-primary mr-2" id="top3Btn">Top 3 Items</button>
+      <button class="btn btn-primary mr-2" id="bottom3Btn">Bottom 3 Items</button>
+      <button class="btn btn-secondary" id="resetBtn">Reset</button>
+    </div>
+    <ul class="list-group mt-3" id="itemList">
+      <!-- Your list items go here -->
+      <li class="list-group-item">Item 1</li>
+      <li class="list-group-item">Item 2</li>
+      <li class="list-group-item">Item 3</li>
+      <li class="list-group-item">Item 4</li>
+      <li class="list-group-item">Item 5</li>
+      <li class="list-group-item">Item 6</li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function setActive(button, isSortButton) {
+      if (isSortButton) {
+        let buttons = document.querySelectorAll('#ascBtn.active,#descBtn.active');
+        buttons.forEach(button => button.classList.remove('active'));
+      } else {
+        let buttons = document.querySelectorAll('#top3Btn.active,#bottom3Btn.active,#allBtn.active');
+        buttons.forEach(button => button.classList.remove('active'));
+      }
+      button.classList.add('active');
+    }
+
+    let originalList = Array.from(document.getElementById('itemList').children);
+    let isAscending = true;
+
+    // JavaScript code for button functionality
+    document.getElementById('ascBtn').addEventListener('click', function() {
+      setActive(this, true);
+      isAscending = true;
+
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      let sortedItems = Array.from(originalList)
+        .sort((a, b) => a.textContent.localeCompare(b.textContent));
+      sortedItems.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+    });
+
+    document.getElementById('descBtn').addEventListener('click', function() {
+      setActive(this, true);
+      isAscending = false;
+
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      let sortedItems = Array.from(originalList)
+        .sort((a, b) => b.textContent.localeCompare(a.textContent));
+      sortedItems.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+    });
+
+    document.getElementById('allBtn').addEventListener('click', function() {
+      setActive(this);
+
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      let sortedItems = Array.from(originalList)
+        .sort((a, b) => isAscending ? a.textContent.localeCompare(b.textContent) : b.textContent.localeCompare(a.textContent));
+      sortedItems.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+    });
+    
+    document.getElementById('top3Btn').addEventListener('click', function() {
+      setActive(this);
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      let sortedItems = Array.from(originalList)
+        .slice(0, 3);
+      sortedItems.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+    });
+
+    document.getElementById('bottom3Btn').addEventListener('click', function() {
+      setActive(this);
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      let sortedItems = Array.from(originalList)
+        .slice(-3);
+      sortedItems.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', function() {
+      setActive(this);
+      let list = document.getElementById('itemList');
+      list.innerHTML = '';
+      originalList.forEach(item => {
+        let clone = item.cloneNode(true);
+        list.appendChild(clone);
+      });
+      setActive(document.getElementById('ascBtn'), true);
+    });
+  </script>
+  </body>
+</html>
