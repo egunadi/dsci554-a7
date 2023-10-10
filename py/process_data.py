@@ -46,7 +46,9 @@ def process_data():
         
     combined_df['continent'] = combined_df['name'].apply(get_continent)
 
-    combined_df.to_csv('../data/life_expectancy_and_wages.csv', encoding='utf-8', index=False)
+    combined_df.to_csv('../data/life_expectancy_and_wages.tsv', 
+                       encoding='utf-8', index=False,
+                       sep='\t')
 
 if __name__ == '__main__':
     process_data()

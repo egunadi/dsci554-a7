@@ -81,15 +81,15 @@
   </style>
   <div class="text-center mb-2">
     Show <span class="button filter" id="all">all</span>
-    <span class="button filter" id="closer">closest to Sun</span>
-    <span class="button filter" id="farther">farthest from Sun</span>
-    <input type="checkbox" checked> Earth
+    <span class="button filter" id="europe">European countries</span>
+    <span class="button filter" id="asia">Asian countries</span>
+    <span class="button filter" id="america">American countries</span>
   </div>
   
   <div class="text-center mb-2">
-    Sort by <span class="button sort" id="distance">distance to Sun</span>
-    <span class="button sort" id="temperature">temperature</span>
-    <span class="button sort" id="gravity">gravity</span>
+    Sort by <span class="button sort" id="continent">continent</span>
+    <span class="button sort" id="wage_ratio">wage_ratio</span>
+    <span class="button sort" id="life_expectancy">life_expectancy</span>
   </div>
   
   <div id="chart"></div>
@@ -105,28 +105,28 @@
       .append('g')
       .attr('transform', 'translate(' + margin.left + ', ' + margin.top + ')');
   
-    var all, closer, farther, earth;
-    d3.tsv('planets.tsv', d => {
+    var all, europe, asia, america;
+    d3.tsv('data/life_expectancy_and_wages.tsv', d => {
       return {
         name: d.name,
-        gravity: +d.gravity,
-        temperature: +d.temperature,
-        distance: +d.distance,
+        life_expectancy: +d.life_expectancy,
+        wage_ratio: +d.wage_ratio,
+        continent: +d.continent,
       };
     }).then(data => {
       all = data;
   
       //initialize data variables
-      earth = data.find((d) => d.name === 'EARTH');  //set earth using array.find
-      closer = data.slice(0, 4);  //set 4 planets closest to the Sun using array.slice here
-      farther = data.slice(data.length - 4);  //set 4 planets farthest from the Sun using array.slice here
+      europe = data.slice(0, 4);  //set 4 planets closest to the Sun using array.slice here
+      america = data.slice(4, 5);  //set 4 planets closest to the Sun using array.slice here
+      asia = data.slice(data.length - 5);  //set 4 planets farthest from the Sun using array.slice here
   
       //set initial state
       filter('#all');
-      sort('#distance');
+      sort('#life_expectancy');
   
       toggleFilter('#all');
-      toggleSort('#distance');
+      toggleSort('#life_expectancy');
   
       draw();
     });
@@ -138,34 +138,33 @@
     var current, sortMode, filterMode;
   
     //sort event handlers
-    d3.select('#distance')
+    d3.select('#continent')
       .on('click', () => {
-        sort('#distance');
+        sort('#continent');
         transition();
-        toggleSort('#distance');
+        toggleSort('#continent');
       });
   
-    d3.select('#temperature')
+    d3.select('#wage_ratio')
       .on('click', () => {
-        //sort by temperature
-        sort('#temperature');
+        //sort by wage_ratio
+        sort('#wage_ratio');
         transition();
-        toggleSort('#temperature');
+        toggleSort('#wage_ratio');
       });
   
-    d3.select('#gravity')
+    d3.select('#life_expectancy')
       .on('click', () => {
-        //sort by gravity
-        sort('#gravity');
+        //sort by life_expectancy
+        sort('#life_expectancy');
         transition();
-        toggleSort('#gravity');
+        toggleSort('#life_expectancy');
       });
   
     //filter event handlers
     d3.select('#all')
       .on('click', () => {
         filter('#all');
-        includeEarth(d3.select('input').property('checked'));
         sort(sortMode);
   
         toggleSort(sortMode);
@@ -174,95 +173,50 @@
         redraw();
       });
   
-    d3.select('#closer')
+    d3.select('#europe')
       .on('click', () => {
-        filter('#closer');
-        includeEarth(d3.select('input').property('checked'));
+        filter('#europe');
         sort(sortMode);
   
         toggleSort(sortMode);
-        toggleFilter('#closer');
+        toggleFilter('#europe');
   
         redraw();
       });
   
-    d3.select('#farther')
+    d3.select('#asia')
       .on('click', () => {
-        filter('#farther');
+        filter('#asia');
         sort(sortMode);
   
         toggleSort(sortMode);
-        toggleFilter('#farther');
+        toggleFilter('#asia');
   
         redraw();
       });
-  
-    d3.select('input')
-      .on('change', () => {
-        includeEarth(d3.select('input').property('checked'));
-  
-        sort(sortMode);
-        toggleSort(sortMode);
-  
-        redraw();
-      });
-  
-    function includeEarth(includeEarth) {
-      if (filterMode === '#all') {
-        var index = current
-          .map(d => d.name)
-          .indexOf('EARTH');
-  
-        if (index == -1 && includeEarth) {
-          current.push(earth); //add Earth
-        }
-        
-        if (index && !includeEarth) {
-          current.splice(index, 1); //remove
-        }
-      } else if (filterMode === '#closer') {
-        if (!includeEarth) {
-          current = JSON.parse(JSON.stringify(all));
-  
-          var index = current
-            .map(d => d.name)
-            .indexOf('EARTH');
-          
-          if (index != -1) {
-            current.splice(index, 1); //remove Earth
-          }
-  
-          current = current.slice(0, 4);
-        } else {
-          current = JSON.parse(JSON.stringify(closer));
-        }
-      }
-    }
   
     function filter(mode) {
       if (mode === '#all') {
         current = JSON.parse(JSON.stringify(all));
-      } else if (mode === '#closer') {
-        current = JSON.parse(JSON.stringify(closer));
-      } else if (mode === '#farther') {
-        current = JSON.parse(JSON.stringify(farther));
+      } else if (mode === '#europe') {
+        current = JSON.parse(JSON.stringify(europe));
+      } else if (mode === '#america') {
+        current = JSON.parse(JSON.stringify(america));
+      } else if (mode === '#asia') {
+        current = JSON.parse(JSON.stringify(asia));
       }
       filterMode = mode;
     }
   
     function sort(mode) {
-      if (mode === '#distance') {
-        current.sort((a, b) => d3.ascending(a.distance, b.distance));
+      if (mode === '#life_expectancy') {
+        current.sort((a, b) => d3.ascending(a.life_expectancy, b.life_expectancy));
         //update x axis label
-        d3.select('#x-axis-label').text('Sorted from smaller to larger distance from Sun');
-      } else if (mode === '#gravity') {
-        current.sort((a, b) => d3.ascending(a.gravity, b.gravity));
+        d3.select('#x-axis-label').text('Sorted from smaller to larger life_expectancy');
+      } else if (mode === '#wage_ratio') {
+        current.sort((a, b) => d3.ascending(a.wage_ratio, b.wage_ratio));
         //update x axis label
-        d3.select('#x-axis-label').text('Sorted from smaller to larger gravity');
-      } else if (mode === '#temperature') {
-        current.sort((a, b) => d3.ascending(a.temperature, b.temperature));
-        //update x axis label
-        d3.select('#x-axis-label').text('Sorted from smaller to larger temperature');
+        d3.select('#x-axis-label').text('Sorted from smaller to larger wage_ratio');
       }
       x.domain(current.map(d => d.name));
       sortMode = mode;
@@ -320,9 +274,9 @@
         .duration(750)
         .attr('class', 'bar')
         .attr('x', d => x(d.name))
-        .attr('y', d => y(d.gravity))
+        .attr('y', d => y(d.life_expectancy))
         .attr('width', x.bandwidth())
-        .attr('height', d => height - y(d.gravity));
+        .attr('height', d => height - y(d.life_expectancy));
   
       // EXIT.
       bars.exit()
@@ -346,15 +300,14 @@
       name.enter()
         .append('text')
         .attr('x', d => x(d.name) + x.bandwidth() / 2)
-        .attr('y', d => y(d.gravity) + (height - y(d.gravity)) / 2)
+        .attr('y', d => y(d.life_expectancy) + (height - y(d.life_expectancy)) / 2)
         .style('opacity', 0)
         .transition()
         .duration(1000)
         .text(d => d.name)
         .attr('class', 'name')
-        .attr('style', d => d.name === 'EARTH' ? 'fill: red' : '')
         .attr('x', d => x(d.name) + x.bandwidth() / 2)
-        .attr('y', d => y(d.gravity) + (height - y(d.gravity)) / 2)
+        .attr('y', d => y(d.life_expectancy) + (height - y(d.life_expectancy)) / 2)
         .style('opacity', 1);
   
       // EXIT.
@@ -383,7 +336,7 @@
         .range([0, width])
         .paddingInner(0.2);
   
-      y.domain([0, d3.max(current, d => d.gravity)])
+      y.domain([0, d3.max(current, d => d.life_expectancy)])
         .range([height, 0]);
   
       svg.selectAll('.bar')
@@ -392,9 +345,9 @@
         .append('rect')
         .attr('class', 'bar')
         .attr('x', d => x(d.name))
-        .attr('y', d => y(d.gravity))
+        .attr('y', d => y(d.life_expectancy))
         .attr('width', x.bandwidth())
-        .attr('height', d => height - y(d.gravity));
+        .attr('height', d => height - y(d.life_expectancy));
   
       svg.selectAll('.name')
         .data(current, d => d.name)
@@ -402,9 +355,8 @@
         .append('text')
         .text(d => d.name)
         .attr('class', 'name')
-        .attr('style', d => d.name === 'EARTH' ? 'fill: red' : '')
         .attr('x', d => x(d.name) + x.bandwidth() / 2)
-        .attr('y', d => y(d.gravity) + (height - y(d.gravity)) / 2);
+        .attr('y', d => y(d.life_expectancy) + (height - y(d.life_expectancy)) / 2);
   
       var xAxis;
       xAxis = d3.axisBottom()
@@ -422,7 +374,7 @@
         .attr('x', width / 2)
         .attr('y', height + 20)
         .attr('class', 'label')
-        .text('Sorted from smaller to larger distance from Sun')
+        .text('Sorted from smaller to larger continent from Sun')
         .attr('id', 'x-axis-label');
   
       var yAxis = d3.axisLeft()
@@ -438,7 +390,7 @@
         .attr('y', - margin.left * 0.7)
         .attr('transform', 'rotate(-90)')
         .attr('class', 'label')
-        .append('tspan').text('Gravity ms')
+        .append('tspan').text('life_expectancy ms')
         .append('tspan').text('-2')
         .style('baseline-shift', 'super')
         .style('font-size', '0.7em');
