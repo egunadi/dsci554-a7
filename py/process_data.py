@@ -29,6 +29,22 @@ def process_data():
     wages_df = wages_df.rename(columns={'Country or Area': 'name'})
     
     combined_df = life_expectancy_df.merge(wages_df, on='name')
+    
+    europe_list = ['Belarus', 'Sweden', 'Ukraine', 'United Kingdom']
+    asia_list = ['Indonesia', 'Philippines', 'Singapore', 'Sri Lanka']
+    america_list = ['Mexico', 'Paraguay']
+    
+    def get_continent(country):
+        if country in europe_list:
+            return 'Europe'
+        if country in asia_list:
+            return 'Asia'
+        if country in america_list:
+            return 'America'
+        else:
+            return 'None'
+        
+    combined_df['continent'] = combined_df['name'].apply(get_continent)
 
     combined_df.to_csv('../data/life_expectancy_and_wages.csv', encoding='utf-8', index=False)
 
