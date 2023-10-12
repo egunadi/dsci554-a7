@@ -87,9 +87,8 @@
   </div>
   
   <div class="text-center mb-2">
-    Sort by <span class="button sort" id="continent">continent</span>
+    Sort by <span class="button sort" id="life_expectancy">life_expectancy</span>
     <span class="button sort" id="wage_ratio">wage_ratio</span>
-    <span class="button sort" id="life_expectancy">life_expectancy</span>
   </div>
   
   <div id="chart"></div>
@@ -138,13 +137,6 @@
     var current, sortMode, filterMode;
   
     //sort event handlers
-    d3.select('#continent')
-      .on('click', () => {
-        sort('#continent');
-        transition();
-        toggleSort('#continent');
-      });
-  
     d3.select('#wage_ratio')
       .on('click', () => {
         //sort by wage_ratio
@@ -212,11 +204,11 @@
       if (mode === '#life_expectancy') {
         current.sort((a, b) => d3.ascending(a.life_expectancy, b.life_expectancy));
         //update x axis label
-        d3.select('#x-axis-label').text('Sorted from smaller to larger life_expectancy');
+        d3.select('#x-axis-label').text('Sorted → from smaller to larger life expectancy at birth');
       } else if (mode === '#wage_ratio') {
         current.sort((a, b) => d3.ascending(a.wage_ratio, b.wage_ratio));
         //update x axis label
-        d3.select('#x-axis-label').text('Sorted from smaller to larger wage_ratio');
+        d3.select('#x-axis-label').text('Sorted → from smaller to larger ratio of male to female wages');
       }
       x.domain(current.map(d => d.name));
       sortMode = mode;
@@ -374,7 +366,7 @@
         .attr('x', width / 2)
         .attr('y', height + 20)
         .attr('class', 'label')
-        .text('Sorted from smaller to larger continent from Sun')
+        .text('Sorted → from smaller to larger life expectancy at birth')
         .attr('id', 'x-axis-label');
   
       var yAxis = d3.axisLeft()
@@ -390,8 +382,8 @@
         .attr('y', - margin.left * 0.7)
         .attr('transform', 'rotate(-90)')
         .attr('class', 'label')
-        .append('tspan').text('life_expectancy ms')
-        .append('tspan').text('-2')
+        .append('tspan').text('life_expectancy (years)')
+        .append('tspan').text('')
         .style('baseline-shift', 'super')
         .style('font-size', '0.7em');
     }
