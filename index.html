@@ -107,18 +107,20 @@
     var all, europe, asia, america;
     d3.tsv('data/life_expectancy_and_wages.tsv', d => {
       return {
+        // unary plus used to convert values to numbers
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Unary_plus
         name: d.name,
         life_expectancy: +d.life_expectancy,
         wage_ratio: +d.wage_ratio,
-        continent: +d.continent,
+        continent: d.continent,
       };
     }).then(data => {
       all = data;
   
       //initialize data variables
-      europe = data.slice(0, 4);  //set 4 planets closest to the Sun using array.slice here
-      america = data.slice(4, 5);  //set 4 planets closest to the Sun using array.slice here
-      asia = data.slice(data.length - 5);  //set 4 planets farthest from the Sun using array.slice here
+      europe = data.filter(country => country.continent == 'Europe');
+      america = data.filter(country => country.continent == 'America');
+      asia = data.filter(country => country.continent == 'Asia');
   
       //set initial state
       filter('#all');
@@ -183,6 +185,17 @@
   
         toggleSort(sortMode);
         toggleFilter('#asia');
+  
+        redraw();
+      });
+
+    d3.select('#america')
+      .on('click', () => {
+        filter('#america');
+        sort(sortMode);
+  
+        toggleSort(sortMode);
+        toggleFilter('#america');
   
         redraw();
       });
